@@ -56,7 +56,7 @@ def welcome():
         num_slots_zero = int(input(f'\t2.) How many of the slots will be labeled with 0 or 00? Choose a number between 0 and 2: '))
 
     num_visits = int(input(f'\t3.) How many times do you want to visit the casino? Choose a number between 1 and 100,000: '))
-    # Input check 
+    # Input c heck 
     while num_visits < 1 or num_visits > 100_000:
         print(f'\tThat was not a valid input...')
         num_visits = int(input(f'\t3.) How many times do you want to visit the casino? Choose a number between 1 and 100,000: '))
@@ -67,19 +67,41 @@ def welcome():
         print(f'\tThat was not a valid input...')
         num_money = int(input(f'\t4.) How much money do you want to start with? Choose a number between 1 and 1,000,000: '))
 
-    
-    # Debugging
-    print(f'\nhello')
+def bet_choice():
+    bet_msg = """
+        Alright, now we are going to choose a betting strategy. You have three choices... 
+
+        1.) The Martingale strategy, you will start by betting $1. If you win your bet, you quit. If you lose, you double the bet and go again. 
+            (This process will continue until you are either out of money, or you win and would like to leave the casino)
+            
+        2.) A random strategy, each time you bet, you bet a random amount from $1 to all of the money you have left.
+            (This strategy will continue until you either run out of money, or you have bet 50 times, whichever comes first)
+        
+        3.) A fixed bet strategy, each time you bet, you bet a fixed amount, from $1 to the amount of money you start with.
+            (This strategy will continue until you either run out of money (*the amount of money left dips below the fixed bet size) or you have bet 50 times)"""
+    print(bet_msg)
+
+    user_choice = int(input(f'\n\tEnter 1, 2 , or 3 to choose your strategy: '))
+    while user_choice < 1 or user_choice > 3:
+        print(f'\n\tThat was not a valid input...')
+        user_choice = int(input(f'\n\tEnter 1, 2 , or 3 to choose your strategy: '))
+
+        if user_choice == 1:
+            martingale()
+        elif user_choice == 2:
+            random()
+        elif user_choice == 3:
+            fixed()
+
+def martingale():
+    print(f'\n\tmartingale')
+
+def random():
+    print(f'\n\trandom')
+
+def fixed(): 
+    print(f'\n\tfixed')
 
 welcome()
+bet_choice()
 
-# Debugging
-print(num_slots)
-
-# Debugging
-def test_func():
-    global num_slots
-    print('test_func num slots: ', num_slots)
-
-# Debugging
-test_func()
