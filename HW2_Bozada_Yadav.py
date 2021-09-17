@@ -1,4 +1,5 @@
 ''' Homework 2 9 (Double or Nothing) - Created by Dylan Bozada & Priyanka Yadav
+    Program Language: Python :)
     Date: 09/15/2021
     Class: CMP_SCI 4500
     External Files: None
@@ -6,11 +7,11 @@
     This program is a simulated casino environment were the
     user will be playing a modified verison of the game 'roulette' '''
 
+# Importing necessary packages
+import random
+
 # Defining global variables to be accessed by all functions of the program
 num_slots, num_slots_zero, num_visits, num_money = 0, 0, 0, 0
-
-# Debugging 
-print(f'\n\t\t num vars before welcome', num_slots, num_slots_zero, num_visits, num_money)
 
 # Defining funtions for the program
 
@@ -33,7 +34,7 @@ def welcome():
         Today we are going to be playing the game Roulette."""
     print(welcome_msg)
 
-    input(f'\n\tPress any key to continue...\n')
+    input(f'\n\tPress the Enter key to continue...\n')
 
     # Prompting user for their visit specifications
     visit_details_msg = """
@@ -56,7 +57,7 @@ def welcome():
         num_slots_zero = int(input(f'\t2.) How many of the slots will be labeled with 0 or 00? Choose a number between 0 and 2: '))
 
     num_visits = int(input(f'\t3.) How many times do you want to visit the casino? Choose a number between 1 and 100,000: '))
-    # Input c heck 
+    # Input check 
     while num_visits < 1 or num_visits > 100_000:
         print(f'\tThat was not a valid input...')
         num_visits = int(input(f'\t3.) How many times do you want to visit the casino? Choose a number between 1 and 100,000: '))
@@ -68,7 +69,9 @@ def welcome():
         num_money = int(input(f'\t4.) How much money do you want to start with? Choose a number between 1 and 1,000,000: '))
 
 def bet_choice():
+    # Giving the user their betting options
     bet_msg = """
+
         Alright, now we are going to choose a betting strategy. You have three choices... 
 
         1.) The Martingale strategy, you will start by betting $1. If you win your bet, you quit. If you lose, you double the bet and go again. 
@@ -82,26 +85,163 @@ def bet_choice():
     print(bet_msg)
 
     user_choice = int(input(f'\n\tEnter 1, 2 , or 3 to choose your strategy: '))
+    if user_choice == 1:
+            martingale()
+    elif user_choice == 2:
+            rndm()
+    elif user_choice == 3:
+            fixed()
+
+    # Input check
     while user_choice < 1 or user_choice > 3:
         print(f'\n\tThat was not a valid input...')
         user_choice = int(input(f'\n\tEnter 1, 2 , or 3 to choose your strategy: '))
-
         if user_choice == 1:
             martingale()
         elif user_choice == 2:
-            random()
+            rndm()
         elif user_choice == 3:
             fixed()
 
-def martingale():
-    print(f'\n\tmartingale')
+# This function will spin the wheel and return the user's color they landed on 
+def wheel_spin():
+    global num_slots, num_slots_zero
+    # Total slots on wheel including zeroes
+    if num_slots_zero == 0:
+        total_slots = num_slots
+    elif num_slots_zero == 1:
+        total_slots = (num_slots - 1) + num_slots_zero
+    elif num_slots_zero == 2:
+        total_slots = (num_slots - 2) + num_slots_zero
 
-def random():
-    print(f'\n\trandom')
+    # Strings to assign number to color
+    black, red, green, user_color = 'black', 'red', 'green', ''
+
+    # Creating list of numbers, we have to do this to makeup for the fact that there may or may not be zeroes in the wheel
+    # We will also replace 1 or 2 of the numbers in the list with 0 if the user selected to have zeroes on the wheel
+    slot_list = []
+    for i in range(1, total_slots + 1):
+        slot_list.append(i)
+
+    if num_slots_zero == 1:
+        slot_list[random.randrange(total_slots)] = 0
+    elif num_slots_zero == 2:
+        slot_list[random.randrange(total_slots)] = 0
+        slot_list[random.randrange(total_slots - 1)] = 0
+
+    # Generating random number, and modulus to determine if wheel landed on black or red
+    # Even = black, Odd = red, 0 = green
+    num_landed = random.choice(slot_list)
+    if num_landed % 2 == 0:
+        user_color = black
+    elif num_landed % 2 != 0:
+        user_color = red
+    elif num_landed == 0:
+        user_color = green
+
+    return(user_color)
+
+def martingale():
+    global num_visits, num_money
+
+    print(f'\n\tMartingale!')
+    print(f'\n\tGoing to the casino...')
+
+    # Empty list to store each visits winnings
+    visit_wins = []
+
+    for visits in range(num_visits):
+        # Starting bet of $1, and creating wallet equal to user input of money they started with 
+        bet = 1
+        wallet = num_money
+
+        while wallet > 0:
+            wallet -= bet
+            color = wheel_spin()
+            if color == 'black':
+                wallet += (bet*2)
+                break
+            elif color == 'red':
+                bet *= 2
+                continue
+            elif color == 'green':
+                wallet += bet
+                continue
+
+        visit_wins.append(wallet)
+
+    print(visit_wins) #Debugging
+
+def rndm():
+    global num_visits, num_money
+    print(f'\n\tRandom!')
+    print(f'\n\tGoing to the casino...')
+
+    # Empty list to store each visits winnings
+    visit_wins = []
+
+    for visits in range(num_visits):
+        # Starting bet, random number between 1 and amount of money
+        bet = random.randrange(1, num_money)
+        bet_limit = 0
+        wallet = num_money
+
+        while wallet >= bet and bet_limit < 50:
+            wallet -= bet
+            color = wheel_spin()
+            if color == 'black':
+                wallet += (bet*2)
+                bet_limit += 1
+                continue
+            elif color == 'red':
+                bet_limit += 1
+                continue
+            elif color == 'green':
+                wallet += bet
+                bet_limit += 1
+                continue
+
+        visit_wins.append(wallet)
+
+    print(visit_wins) # Debugging
 
 def fixed(): 
-    print(f'\n\tfixed')
+    global num_visits, num_money
+
+    print(f'\n\tFixed!')
+    bet = int(input(f'\tPlease choose a number between 1 and ' + str(num_money) + ': '))
+    if bet < 1 or bet > num_money:
+        print(f'\n\tNot an option...')
+        bet = int(input(f'\tPlease choose a number between 1 and ' + str(num_money) + ': '))
+
+    print(f'\n\tGoing to the casino...')
+
+    # Empty list to store each visits winnings
+    visit_wins = []
+
+    for visits in range(num_visits):
+        # Starting bet, random number between 1 and amount of money
+        bet_limit = 0
+        wallet = num_money
+
+        while wallet >= bet and bet_limit < 50:
+            wallet -= bet
+            color = wheel_spin()
+            if color == 'black':
+                wallet += (bet*2)
+                bet_limit += 1
+                continue
+            elif color == 'red':
+                bet_limit += 1
+                continue
+            elif color == 'green':
+                wallet += bet
+                bet_limit += 1
+                continue
+
+        visit_wins.append(wallet)
+
+    print(visit_wins) # Debugging
 
 welcome()
 bet_choice()
-
