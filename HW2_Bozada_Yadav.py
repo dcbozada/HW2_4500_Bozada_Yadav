@@ -9,9 +9,11 @@
 
 # Importing necessary packages
 import random
+import math
 
 # Defining global variables to be accessed by all functions of the program
 num_slots, num_slots_zero, num_visits, num_money = 0, 0, 0, 0
+visit_wins = []
 
 # Defining funtions for the program
 
@@ -142,13 +144,10 @@ def wheel_spin():
     return(user_color)
 
 def martingale():
-    global num_visits, num_money
+    global num_visits, num_money, visit_wins
 
     print(f'\n\tMartingale!')
     print(f'\n\tGoing to the casino...')
-
-    # Empty list to store each visits winnings
-    visit_wins = []
 
     for visits in range(num_visits):
         # Starting bet of $1, and creating wallet equal to user input of money they started with 
@@ -170,15 +169,10 @@ def martingale():
 
         visit_wins.append(wallet)
 
-    print(visit_wins) #Debugging
-
 def rndm():
-    global num_visits, num_money
+    global num_visits, num_money, visit_wins
     print(f'\n\tRandom!')
     print(f'\n\tGoing to the casino...')
-
-    # Empty list to store each visits winnings
-    visit_wins = []
 
     for visits in range(num_visits):
         # Starting bet, random number between 1 and amount of money
@@ -203,10 +197,8 @@ def rndm():
 
         visit_wins.append(wallet)
 
-    print(visit_wins) # Debugging
-
 def fixed(): 
-    global num_visits, num_money
+    global num_visits, num_money, visit_wins
 
     print(f'\n\tFixed!')
     bet = int(input(f'\tPlease choose a number between 1 and ' + str(num_money) + ': '))
@@ -215,9 +207,6 @@ def fixed():
         bet = int(input(f'\tPlease choose a number between 1 and ' + str(num_money) + ': '))
 
     print(f'\n\tGoing to the casino...')
-
-    # Empty list to store each visits winnings
-    visit_wins = []
 
     for visits in range(num_visits):
         # Starting bet, random number between 1 and amount of money
@@ -241,7 +230,84 @@ def fixed():
 
         visit_wins.append(wallet)
 
-    print(visit_wins) # Debugging
+# Summary of casino visits
+def summary():
+    global num_money, num_slots, num_slots_zero, num_visits, visit_wins
+    start_summary = """
+        Alrighty, just wrapped up. Here is a summary of your casino visits!
+
+        """
+    print(start_summary)
+
+    # Telling user the initial inputs
+    print(f'\tHere are your initial inputs:\n')
+    print(f'\tAmount of slots on the wheel:', num_slots)
+    print(f'\tAmount of slots with zero on the wheel:', num_slots_zero)
+    print(f'\tAmount of visits to the casino:', num_visits)
+    print(f'\tAmount of money you started each visit with:', num_money)
+
+    # Telling user the total number of dollars they put at risk
+    total_risk = num_visits * num_money
+    print(f'\n\tThis is the total amount of money you risked in all of your visits:', total_risk)
+
+    # Telling user the total amount they walked away with
+    total_walked_away = 0
+    for i in range(len(visit_wins)):
+        total_walked_away += visit_wins[i]
+    print(f'\n\tThe total amount of money you walked away with:', total_walked_away)
+    
+    # Telling use their best gain at a visit
+    best_visit = max(visit_wins)
+    if best_visit > num_money:
+        best_gain = best_visit - num_money
+        print(f'\n\tYour best gain was:', best_gain)
+    elif best_visit < num_money:
+        print(f'\n\tYou did not walk away a winner in any of your visits :(')
+
+    # Telling how many visits ended with zero money left
+    visit_no_money = 0
+    for i in range(len(visit_wins)):
+        if visit_wins[i] == 0:
+            visit_no_money += 1
+
+    if visit_no_money > 0:
+        print(f'\n\tYou had', str(visit_no_money), ' visits that you left with zero dollars')
+    elif visit_no_money == 0:
+        print('f\n\tYou left with some money each visit! Nice!')
+        
+    # Computing average of money change in N visits, then letting user know
+    top_of_change = 0
+
+    for i in range(0, (len(visit_wins) - 1)):
+        num_between = (visit_wins[i] + visit_wins[i + 1]) / 2
+        dist_between = (visit_wins[i] - num_between) * 2
+        top_of_change += dist_between
+
+    bottom_of_change = num_visits - 1
+
+    average_of_change = top_of_change / bottom_of_change
+
+    print(f'\n\tThe average change of your money in the visits:', math.ceil(average_of_change))
+
+    # Telling user how many times through their visits they were a winner, loser, and broke even
+    total_wins = 0
+    total_loss = 0
+    total_broke_even = 0
+
+    for i in range(len(visit_wins)):
+        if visit_wins[i] > num_money:
+            total_wins += 1
+        elif visit_wins[i] > num_money:
+            total_loss += 1
+        elif visit_wins[i] > num_money:
+            total_broke_even += 1
+
+    print(f'\n\tYou had', total_wins, 'visits you left a winner')
+    print(f'\n\tYou had', total_loss, 'visits you left a loser')
+    print(f'\n\tYou had', total_broke_even, 'visits you left and broke even')
 
 welcome()
 bet_choice()
+summary()
+
+print(f'\n\n\tThanks for playing! Have a good one!\n')
